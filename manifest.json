@@ -1,0 +1,29 @@
+{
+  "name": "双方向翻訳アプリ - Face-to-Face Translator",
+  "short_name": "翻訳アプリ",
+  "description": "二人で向かい合って使える多言語翻訳PWAアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Im0xMi44NyA0LTQuNTggMTFoLTEuMTNsLS45Ny0yLjJIMi4yN2wtLjk3IDIuMkg0LjEzbC00LjU4LTExaDEuMzJsNCAxMC4wOCA0LTEwLjA4em02LjEzIDBoMS4xdjEwLjA4TDI0IDRoMS4zMmwtNC41OCAxMWgtMS4xM0wxOC42NCAxNWgtMy45MmwtLjk3IDJoLTEuMTNMMTcuMiA0eiIvPgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB4PSIxMjgiIHk9IjEyOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPgo8cGF0aCBkPSJtMTIuODcgNC00LjU4IDExaC0xLjEzbC0uOTctMi4ySDIuMjdsLS45NyAyLjJINC4xM2wtNC41OC0xMWgxLjMybDQgMTAuMDggNC0xMC4wOHptNi4xMyAwaC0xdi0xaDEuM2wtNC41OCAxMWgtMS4xM0wxOC42NCAxNWgtMy45MmwtLjk3IDJoLTEuMTNMMTcuMiA0eiIvPgo8L3N2Zz4KPC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "education"],
+  "lang": "ja",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}

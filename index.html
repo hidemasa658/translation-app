@@ -4,55 +4,628 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>双方向翻訳アプリ</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .demo {
-            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             padding: 20px;
-            background: #f0f8ff;
-            border-radius: 10px;
-            margin: 20px 0;
+            gap: 20px;
+        }
+
+        .language-selector {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .language-selector select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .translation-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .user-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .user-section.bottom {
+            transform: rotate(180deg);
+        }
+
+        .user-label {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .io-container {
+            display: flex;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .input-section, .output-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .text-area {
+            flex: 1;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 16px;
+            resize: none;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .output-area {
+            background: #f8f9ff;
+            color: #333;
+            cursor: default;
+            border-color: #e1e5f0;
+        }
+
+        .input-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .clear-button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .install-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+            font-size: 12px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #f44336;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .offline-indicator.online {
+            background: #4CAF50;
+        }
+
+        /* iPad・タブレット対応 */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .user-section {
+                padding: 15px;
+            }
+            
+            .io-container {
+                gap: 10px;
+            }
+        }
+
+        /* スマートフォン対応 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .user-section {
+                padding: 15px;
+            }
+            
+            .io-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .text-area {
+                min-height: 80px;
+            }
+
+            .install-button {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 11px;
+            }
         }
     </style>
 </head>
 <body>
+    <button id="installButton" class="install-button">📱 アプリ化</button>
+    <div id="offlineIndicator" class="offline-indicator">オフライン</div>
+
     <div class="container">
-        <h1>🌍 双方向翻訳アプリ</h1>
-        <div class="demo">
-            <h2>🎉 GitHub Pages で公開成功！</h2>
-            <p>このページが表示されれば、PWAアプリが正常に公開されています。</p>
-            <p>現在、完全版のPWA機能を準備中です...</p>
+        <div class="language-selector">
+            <select id="languagePair">
+                <option value="ja,en" data-display1="日本語" data-display2="English">日本語 ⇔ 英語</option>
+                <option value="ja,zh" data-display1="日本語" data-display2="中文">日本語 ⇔ 中国語</option>
+                <option value="en,zh" data-display1="English" data-display2="中文">英語 ⇔ 中国語</option>
+            </select>
         </div>
-        <div class="demo">
-            <h3>📱 機能予定</h3>
-            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
-                <li>日本語 ⇔ 英語 翻訳</li>
-                <li>日本語 ⇔ 中国語 翻訳</li>
-                <li>英語 ⇔ 中国語 翻訳</li>
-                <li>PWAアプリとしてインストール可能</li>
-                <li>オフライン動作</li>
-                <li>二人で向かい合って使用可能</li>
-            </ul>
+
+        <div class="translation-area">
+            <!-- 上側のユーザー -->
+            <div class="user-section top">
+                <div class="user-label" id="topLabel">User 1 (日本語)</div>
+                <div class="io-container">
+                    <div class="input-section">
+                        <div class="section-title">入力</div>
+                        <textarea class="text-area" id="topInput" placeholder="ここに入力してください..."></textarea>
+                        <button class="input-button" onclick="handleTranslate('top')">翻訳</button>
+                        <button class="clear-button" onclick="clearText('top')">クリア</button>
+                    </div>
+                    <div class="output-section">
+                        <div class="section-title">翻訳結果</div>
+                        <textarea class="text-area output-area" id="topOutput" readonly placeholder="翻訳結果がここに表示されます..."></textarea>
+                    </div>
+                </div>
+                <div class="loading" id="topLoading">翻訳中...</div>
+                <div class="error" id="topError"></div>
+            </div>
+
+            <!-- 下側のユーザー -->
+            <div class="user-section bottom">
+                <div class="user-label" id="bottomLabel">User 2 (English)</div>
+                <div class="io-container">
+                    <div class="input-section">
+                        <div class="section-title">入力</div>
+                        <textarea class="text-area" id="bottomInput" placeholder="Enter text here..."></textarea>
+                        <button class="input-button" onclick="handleTranslate('bottom')">翻訳</button>
+                        <button class="clear-button" onclick="clearText('bottom')">クリア</button>
+                    </div>
+                    <div class="output-section">
+                        <div class="section-title">翻訳結果</div>
+                        <textarea class="text-area output-area" id="bottomOutput" readonly placeholder="Translation will appear here..."></textarea>
+                    </div>
+                </div>
+                <div class="loading" id="bottomLoading">翻訳中...</div>
+                <div class="error" id="bottomError"></div>
+            </div>
         </div>
     </div>
+
+    <script>
+        let currentLanguages = { lang1: 'ja', lang2: 'en', display1: '日本語', display2: 'English' };
+        let deferredPrompt;
+
+        // PWAインストール機能
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installButton').style.display = 'block';
+        });
+
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installButton').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // オフライン/オンライン状態表示
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('offlineIndicator');
+            if (navigator.onLine) {
+                indicator.textContent = 'オンライン';
+                indicator.className = 'offline-indicator online';
+                indicator.style.display = 'block';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 2000);
+            } else {
+                indicator.textContent = 'オフライン';
+                indicator.className = 'offline-indicator';
+                indicator.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // 言語ペア変更
+        document.getElementById('languagePair').addEventListener('change', function(e) {
+            const selectedOption = e.target.selectedOptions[0];
+            const langs = e.target.value.split(',');
+            
+            currentLanguages = {
+                lang1: langs[0],
+                lang2: langs[1],
+                display1: selectedOption.dataset.display1,
+                display2: selectedOption.dataset.display2
+            };
+            
+            updateLabels();
+            clearAllText();
+        });
+
+        function updateLabels() {
+            document.getElementById('topLabel').textContent = `User 1 (${currentLanguages.display1})`;
+            document.getElementById('bottomLabel').textContent = `User 2 (${currentLanguages.display2})`;
+        }
+
+        // 拡張翻訳辞書
+        const translations = {
+            'ja-en': {
+                'こんにちは': 'Hello',
+                'ありがとう': 'Thank you',
+                'おはよう': 'Good morning',
+                'こんばんは': 'Good evening',
+                'さようなら': 'Goodbye',
+                'はい': 'Yes',
+                'いいえ': 'No',
+                'すみません': 'Excuse me',
+                'お疲れ様': 'Good job',
+                'おやすみ': 'Good night',
+                'はじめまして': 'Nice to meet you',
+                'お元気ですか': 'How are you?',
+                '元気です': 'I am fine',
+                'わかりません': 'I don\'t understand',
+                'わかりました': 'I understand',
+                'お願いします': 'Please',
+                'どういたしまして': 'You\'re welcome',
+                '名前': 'Name',
+                '年齢': 'Age',
+                '仕事': 'Job',
+                '学生': 'Student',
+                '会社員': 'Office worker',
+                '日本': 'Japan',
+                'アメリカ': 'America',
+                '中国': 'China',
+                '今日': 'Today',
+                '明日': 'Tomorrow',
+                '昨日': 'Yesterday'
+            },
+            'en-ja': {
+                'hello': 'こんにちは',
+                'thank you': 'ありがとう',
+                'good morning': 'おはよう',
+                'good evening': 'こんばんは',
+                'goodbye': 'さようなら',
+                'yes': 'はい',
+                'no': 'いいえ',
+                'excuse me': 'すみません',
+                'good job': 'お疲れ様',
+                'good night': 'おやすみ',
+                'nice to meet you': 'はじめまして',
+                'how are you': 'お元気ですか',
+                'i am fine': '元気です',
+                'i don\'t understand': 'わかりません',
+                'i understand': 'わかりました',
+                'please': 'お願いします',
+                'you\'re welcome': 'どういたしまして',
+                'name': '名前',
+                'age': '年齢',
+                'job': '仕事',
+                'student': '学生',
+                'office worker': '会社員',
+                'japan': '日本',
+                'america': 'アメリカ',
+                'china': '中国',
+                'today': '今日',
+                'tomorrow': '明日',
+                'yesterday': '昨日'
+            },
+            'ja-zh': {
+                'こんにちは': '你好',
+                'ありがとう': '谢谢',
+                'おはよう': '早上好',
+                'こんばんは': '晚上好',
+                'さようなら': '再见',
+                'はい': '是的',
+                'いいえ': '不是',
+                'すみません': '对不起',
+                'お疲れ様': '辛苦了',
+                'おやすみ': '晚安',
+                'はじめまして': '初次见面',
+                'お元気ですか': '你好吗?',
+                '元気です': '我很好',
+                'わかりません': '我不明白',
+                'わかりました': '我明白了',
+                '名前': '名字',
+                '年齢': '年龄',
+                '仕事': '工作',
+                '学生': '学生',
+                '日本': '日本',
+                '中国': '中国',
+                '今日': '今天',
+                '明日': '明天',
+                '昨日': '昨天'
+            },
+            'zh-ja': {
+                '你好': 'こんにちは',
+                '谢谢': 'ありがとう',
+                '早上好': 'おはよう',
+                '晚上好': 'こんばんは',
+                '再见': 'さようなら',
+                '是的': 'はい',
+                '不是': 'いいえ',
+                '对不起': 'すみません',
+                '辛苦了': 'お疲れ様',
+                '晚安': 'おやすみ',
+                '初次见面': 'はじめまして',
+                '你好吗?': 'お元気ですか',
+                '我很好': '元気です',
+                '我不明白': 'わかりません',
+                '我明白了': 'わかりました',
+                '名字': '名前',
+                '年龄': '年齢',
+                '工作': '仕事',
+                '学生': '学生',
+                '日本': '日本',
+                '中国': '中国',
+                '今天': '今日',
+                '明天': '明日',
+                '昨天': '昨日'
+            },
+            'en-zh': {
+                'hello': '你好',
+                'thank you': '谢谢',
+                'good morning': '早上好',
+                'good evening': '晚上好',
+                'goodbye': '再见',
+                'yes': '是的',
+                'no': '不是',
+                'excuse me': '对不起',
+                'good job': '辛苦了',
+                'good night': '晚安',
+                'nice to meet you': '初次见面',
+                'how are you': '你好吗?',
+                'i am fine': '我很好',
+                'i don\'t understand': '我不明白',
+                'i understand': '我明白了',
+                'name': '名字',
+                'age': '年龄',
+                'job': '工作',
+                'student': '学生',
+                'china': '中国',
+                'america': '美国',
+                'today': '今天',
+                'tomorrow': '明天',
+                'yesterday': '昨天'
+            },
+            'zh-en': {
+                '你好': 'Hello',
+                '谢谢': 'Thank you',
+                '早上好': 'Good morning',
+                '晚上好': 'Good evening',
+                '再见': 'Goodbye',
+                '是的': 'Yes',
+                '不是': 'No',
+                '对不起': 'Excuse me',
+                '辛苦了': 'Good job',
+                '晚安': 'Good night',
+                '初次见面': 'Nice to meet you',
+                '你好吗?': 'How are you?',
+                '我很好': 'I am fine',
+                '我不明白': 'I don\'t understand',
+                '我明白了': 'I understand',
+                '名字': 'Name',
+                '年龄': 'Age',
+                '工作': 'Job',
+                '学生': 'Student',
+                '中国': 'China',
+                '美国': 'America',
+                '今天': 'Today',
+                '明天': 'Tomorrow',
+                '昨天': 'Yesterday'
+            }
+        };
+
+        async function handleTranslate(user) {
+            const inputId = user + 'Input';
+            const outputId = (user === 'top') ? 'bottomOutput' : 'topOutput';
+            const loadingId = user + 'Loading';
+            const errorId = user + 'Error';
+            
+            const inputText = document.getElementById(inputId).value.trim();
+            
+            if (!inputText) {
+                showError(errorId, 'テキストを入力してください');
+                return;
+            }
+            
+            const sourceLang = (user === 'top') ? currentLanguages.lang1 : currentLanguages.lang2;
+            const targetLang = (user === 'top') ? currentLanguages.lang2 : currentLanguages.lang1;
+            
+            showLoading(loadingId, true);
+            clearError(errorId);
+            
+            // 翻訳処理
+            const translationKey = `${sourceLang}-${targetLang}`;
+            const translationDict = translations[translationKey] || {};
+            const lowerInput = inputText.toLowerCase();
+            
+            let translatedText = translationDict[lowerInput];
+            
+            if (translatedText) {
+                document.getElementById(outputId).value = translatedText;
+                clearError(errorId);
+            } else {
+                // 部分マッチング検索
+                const partialMatch = Object.keys(translationDict).find(key => 
+                    key.includes(lowerInput) || lowerInput.includes(key)
+                );
+                
+                if (partialMatch) {
+                    document.getElementById(outputId).value = translationDict[partialMatch];
+                    showError(errorId, `"${partialMatch}" の翻訳を表示しています`);
+                } else {
+                    showError(errorId, '翻訳辞書にない単語です。基本的な挨拶や単語を試してください。');
+                }
+            }
+            
+            showLoading(loadingId, false);
+        }
+
+        function clearText(user) {
+            document.getElementById(user + 'Input').value = '';
+            const outputId = (user === 'top') ? 'bottomOutput' : 'topOutput';
+            document.getElementById(outputId).value = '';
+            clearError(user + 'Error');
+        }
+
+        function clearAllText() {
+            ['top', 'bottom'].forEach(user => {
+                document.getElementById(user + 'Input').value = '';
+                document.getElementById(user + 'Output').value = '';
+                clearError(user + 'Error');
+            });
+        }
+
+        function showLoading(elementId, show) {
+            document.getElementById(elementId).style.display = show ? 'block' : 'none';
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(errorId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function clearError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+
+        // Enterキーで翻訳実行
+        document.getElementById('topInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleTranslate('top');
+            }
+        });
+
+        document.getElementById('bottomInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleTranslate('bottom');
+            }
+        });
+
+        // Service Worker登録
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+
+        // 初期化
+        updateLabels();
+        updateOnlineStatus();
+    </script>
 </body>
 </html>
