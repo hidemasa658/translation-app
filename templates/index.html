@@ -1,3 +1,5 @@
+# PWA版index.htmlを作成
+cat > index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -148,21 +150,6 @@
             transition: all 0.3s ease;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            color: #667eea;
-            font-style: italic;
-            margin-top: 10px;
-        }
-
-        .error {
-            color: #ff6b6b;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
         .install-button {
             position: fixed;
             top: 20px;
@@ -177,26 +164,24 @@
             z-index: 1000;
         }
 
-        .offline-indicator {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #f44336;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 15px;
-            font-size: 12px;
+        .loading {
             display: none;
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+            margin-top: 10px;
         }
 
-        .offline-indicator.online {
-            background: #4CAF50;
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <button id="installButton" class="install-button">アプリとしてインストール</button>
-    <div id="offlineIndicator" class="offline-indicator">オフライン</div>
 
     <div class="container">
         <div class="language-selector">
@@ -270,26 +255,6 @@
             }
         });
 
-        // オフライン/オンライン状態表示
-        function updateOnlineStatus() {
-            const indicator = document.getElementById('offlineIndicator');
-            if (navigator.onLine) {
-                indicator.textContent = 'オンライン';
-                indicator.className = 'offline-indicator online';
-                indicator.style.display = 'block';
-                setTimeout(() => {
-                    indicator.style.display = 'none';
-                }, 2000);
-            } else {
-                indicator.textContent = 'オフライン';
-                indicator.className = 'offline-indicator';
-                indicator.style.display = 'block';
-            }
-        }
-
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
         // 言語ペア変更
         document.getElementById('languagePair').addEventListener('change', function(e) {
             const selectedOption = e.target.selectedOptions[0];
@@ -311,7 +276,7 @@
             document.getElementById('bottomLabel').textContent = `User 2 (${currentLanguages.display2})`;
         }
 
-        // 簡易翻訳機能（デモ用）
+        // 簡易翻訳機能
         const translations = {
             'ja-en': {
                 'こんにちは': 'Hello',
@@ -320,7 +285,9 @@
                 'こんばんは': 'Good evening',
                 'さようなら': 'Goodbye',
                 'はい': 'Yes',
-                'いいえ': 'No'
+                'いいえ': 'No',
+                'すみません': 'Excuse me',
+                'お疲れ様': 'Good job'
             },
             'en-ja': {
                 'hello': 'こんにちは',
@@ -329,7 +296,8 @@
                 'good evening': 'こんばんは',
                 'goodbye': 'さようなら',
                 'yes': 'はい',
-                'no': 'いいえ'
+                'no': 'いいえ',
+                'excuse me': 'すみません'
             },
             'ja-zh': {
                 'こんにちは': '你好',
@@ -353,11 +321,11 @@
                 'goodbye': '再见'
             },
             'zh-en': {
-                '你好': 'hello',
-                '谢谢': 'thank you',
-                '早上好': 'good morning',
-                '晚上好': 'good evening',
-                '再见': 'goodbye'
+                '你好': 'Hello',
+                '谢谢': 'Thank you',
+                '早上好': 'Good morning',
+                '晚上好': 'Good evening',
+                '再见': 'Goodbye'
             }
         };
 
@@ -389,9 +357,6 @@
             
             if (translatedText) {
                 document.getElementById(outputId).value = translatedText;
-            } else if (navigator.onLine) {
-                // オンラインの場合、Google Translate APIを使用（APIキーが必要）
-                showError(errorId, 'オンライン翻訳機能は実装中です。基本的な単語のみ翻訳できます。');
             } else {
                 showError(errorId, '翻訳辞書にない単語です。基本的な単語を試してください。');
             }
@@ -451,3 +416,4 @@
     </script>
 </body>
 </html>
+EOF

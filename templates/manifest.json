@@ -1,15 +1,18 @@
+cat > manifest.json << 'EOF'
 {
   "name": "双方向翻訳アプリ",
   "short_name": "翻訳アプリ",
+  "description": "二人で向かい合って使える翻訳アプリ",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM2NjdlZWEiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Im0xMi44NyA0LTQuNTggMTFoLTEuMTNsLS45Ny0yLjJIMi4yN2wtLjk3IDIuMkg0LjEzbC00LjU4LTExaDEuMzJsNCAxMC4wOCA0LTEwLjA4em02LjEzIDBoMS4xdjEwLjA4TDI0IDRoMS4zMmwtNC41OCAxMWgtMS4xM0wxOC42NCAxNWgtMy45MmwtLjk3IDJoLTEuMTNMMTcuMiA0eiIvPgo8L3N2Zz4KPC9zdmc+",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg+xml"
     }
   ]
 }
+EOF
